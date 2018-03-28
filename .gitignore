@@ -1,0 +1,3 @@
+gateway-data/apps/*.json
+gateway-data/policies/*.json
+redis-data/dump.rdb

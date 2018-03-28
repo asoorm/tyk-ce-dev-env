@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:latest
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - tyk-ce
+
+  gateway:
+    image: tykio/tyk-gateway:latest
+    volumes:
+      - ./gateway-data/apps:/opt/tyk-gateway/apps
+      - ./gateway-data/policies:/opt/tyk-gateway/policies
+      - ./gateway-data/templates:/opt/tyk-gateway/templates
+    ports:
+      - "8080:8080"
+    networks:
+      - tyk-ce
+    environment:
+      # https://tyk.io/docs/configure/gateway-env-variables/
+      - TYK_GW_SECRET=12345
+      - TYK_GW_STORAGE_HOST=redis
+      - TYK_GW_HEALTHCHECK_ENABLEHEALTHCHECKS=false
+      - TYK_GW_COPROCESSOPTIONS_ENABLECOPROCESS=false
+      - TYK_GW_POLICIES_POLICYSOURCE=file
+      - TYK_GW_POLICIES_POLICYRECORDNAME=./policies/policies.json
+
+      # Optimization settings
+      - TYK_GW_STORAGE_MAXIDLE=2000
+      - TYK_GW_STORAGE_MAXACTIVE=4000
+      - TYK_GW_CLOSECONNECTIONS=true
+      - TYK_GW_ENFORCEORGQUOTAS=false
+      - TYK_GW_ENFORCEORGDATADEAILLOGGING=false
+      - TYK_GW_EXPERIMENTALPROCESSORGOFFTHREAD=true
+      - TYK_GW_ENABLENONTRANSACTIONALRATELIMITER=true
+      - TYK_GW_ENABLESENTINELRATELIMITER=false
+      - TYK_GW_LOCALSESSIONCACHE_DISABLECACHESESSIONSTATE=false
+    depends_on:
+      - redis
+
+networks:
+  tyk-ce:

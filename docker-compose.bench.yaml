@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+
+  lwan:
+    # docker run -d -p 8080:8080 -v cwd:/lwan/wwwroot jaxgeller/lwan
+    image: jaxgeller/lwan
+    volumes:
+      - ./lwan-data:/lwan/wwwroot
+    ports:
+      - "9191:8080"
+    depends_on:
+      - gateway
+    networks:
+      - tyk-ce
